@@ -1,0 +1,87 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Router Antennas -->
+    <!-- Left Antenna -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3.2"
+        android:strokeLineCap="round"
+        android:pathData="M38,52 L30,30" />
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M30,30m-2.2,0a2.2,2.2 0,1 1,4.4 0a2.2,2.2 0,1 1,-4.4 0" />
+
+    <!-- Center Antenna -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3.2"
+        android:strokeLineCap="round"
+        android:pathData="M54,50 L54,26" />
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M54,26m-2.2,0a2.2,2.2 0,1 1,4.4 0a2.2,2.2 0,1 1,-4.4 0" />
+
+    <!-- Right Antenna -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3.2"
+        android:strokeLineCap="round"
+        android:pathData="M70,52 L78,30" />
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M78,30m-2.2,0a2.2,2.2 0,1 1,4.4 0a2.2,2.2 0,1 1,-4.4 0" />
+
+    <!-- WiFi Radiating Waves from Center -->
+    <path
+        android:strokeColor="#66FFFFFF"
+        android:strokeWidth="2.0"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M44,20 C47,17 61,17 64,20" />
+    <path
+        android:strokeColor="#B3FFFFFF"
+        android:strokeWidth="2.2"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M40,15 C46,10 62,10 68,15" />
+
+    <!-- Router Main Chassis Body -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M26,52 L82,52 A5,5 0 0 1 87,57 L85,73 A6,6 0 0 1 79,79 L29,79 A6,6 0 0 1 23,73 L21,57 A5,5 0 0 1 26,52 Z" />
+
+    <!-- Chassis Accent Strip -->
+    <path
+        android:fillColor="#002D72"
+        android:pathData="M27,61 L81,61 L80,66 L28,66 Z" />
+
+    <!-- Router Status LED Lights -->
+    <!-- Power (Green) -->
+    <path
+        android:fillColor="#00E676"
+        android:pathData="M33,63.5m-1.5,0a1.5,1.5 0,1 1,3 0a1.5,1.5 0,1 1,-3 0" />
+    <!-- Internet / WAN (Cyan) -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M43,63.5m-1.5,0a1.5,1.5 0,1 1,3 0a1.5,1.5 0,1 1,-3 0" />
+    <!-- WLAN 2.4G (Cyan) -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M53,63.5m-1.5,0a1.5,1.5 0,1 1,3 0a1.5,1.5 0,1 1,-3 0" />
+    <!-- LAN (Cyan) -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M63,63.5m-1.5,0a1.5,1.5 0,1 1,3 0a1.5,1.5 0,1 1,-3 0" />
+    <!-- WPS (Amber) -->
+    <path
+        android:fillColor="#FFD600"
+        android:pathData="M73,63.5m-1.5,0a1.5,1.5 0,1 1,3 0a1.5,1.5 0,1 1,-3 0" />
+
+    <!-- Router Base Feet / Shadow -->
+    <path
+        android:fillColor="#B0BEC5"
+        android:pathData="M30,79 L34,83 L38,79 Z M70,79 L74,83 L78,79 Z" />
+</vector>
