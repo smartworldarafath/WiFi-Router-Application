@@ -83,7 +83,7 @@ fun RouterWebScreen(
 
     var webViewInstance by remember { mutableStateOf<WebView?>(null) }
     var currentUrl by remember { mutableStateOf(configuredUrl) }
-    var pageTitle by remember { mutableStateOf("Netis Router") }
+    var pageTitle by remember { mutableStateOf("Router Admin") }
     var isLoading by remember { mutableStateOf(true) }
     var progress by remember { mutableFloatStateOf(0f) }
     var hasError by remember { mutableStateOf(false) }
@@ -178,7 +178,7 @@ fun RouterWebScreen(
                             super.onPageFinished(view, url)
                             isLoading = false
                             url?.let { currentUrl = it }
-                            pageTitle = view?.title ?: "Netis Router"
+                            pageTitle = view?.title ?: "Router Admin"
                             canGoBack = view?.canGoBack() ?: false
                             canGoForward = view?.canGoForward() ?: false
                         }
@@ -192,7 +192,7 @@ fun RouterWebScreen(
                             if (request?.isForMainFrame == true) {
                                 hasError = true
                                 errorMessage = error?.description?.toString()
-                                    ?: "Cannot connect to Netis Router at $currentUrl"
+                                    ?: "Cannot connect to Router Gateway at $currentUrl"
                             }
                         }
 
@@ -276,7 +276,7 @@ fun RouterWebScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = "Cannot Reach Netis Router",
+                        text = "Cannot Reach Router Gateway",
                         style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                         color = MaterialTheme.colorScheme.onBackground
                     )
@@ -284,7 +284,7 @@ fun RouterWebScreen(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = "Target: $currentUrl\n\nTo view this router page live, your phone must be connected to the Netis router's WiFi network (SSID: netis_2.4G or netis_5G).",
+                        text = "Target: $currentUrl\n\nTo view this router page live, your phone must be connected to the router's WiFi network.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(horizontal = 16.dp),
@@ -353,12 +353,12 @@ fun RouterWebScreen(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // Load Interactive Netis Web Preview in WebView
+                    // Load Interactive Router Web Preview in WebView
                     OutlinedButton(
                         onClick = {
                             hasError = false
                             errorMessage = null
-                            val simulatedHtml = generateNetisLoginHtml()
+                            val simulatedHtml = generateRouterLoginHtml()
                             webViewInstance?.loadDataWithBaseURL(
                                 "http://192.168.1.1/",
                                 simulatedHtml,
@@ -371,7 +371,7 @@ fun RouterWebScreen(
                     ) {
                         Icon(Icons.Default.Router, contentDescription = null, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Load Netis Web Interface Simulation")
+                        Text("Load Router Web Interface Simulation")
                     }
 
                     Spacer(modifier = Modifier.height(8.dp))
@@ -388,18 +388,18 @@ fun RouterWebScreen(
 }
 
 /**
- * Returns an accurate simulated Netis Router Web Dashboard & Login HTML
+ * Returns an accurate simulated WiFi Router Web Dashboard & Login HTML
  * with CSS and interactive JavaScript. This ensures that even when offline
  * or testing in an emulator, the router web interface runs 100% inside the app!
  */
-private fun generateNetisLoginHtml(): String {
+private fun generateRouterLoginHtml(): String {
     return """
     <!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0">
-        <title>Netis Wireless N Router - Login</title>
+        <title>WiFi Router Admin - Login</title>
         <style>
             * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
             body {
@@ -538,8 +538,8 @@ private fun generateNetisLoginHtml(): String {
     <body>
         <div class="container">
             <div class="header">
-                <div class="logo">netis</div>
-                <div class="sub-logo">Wireless N Router WF2409E Web Portal</div>
+                <div class="logo">WiFi Router</div>
+                <div class="sub-logo">Web Management Portal</div>
             </div>
             <div class="card-body">
                 <div class="ip-badge">
@@ -557,25 +557,25 @@ private fun generateNetisLoginHtml(): String {
                     </div>
                     <div class="form-group">
                         <label for="username">Username</label>
-                        <input type="text" id="username" value="guest" required autocomplete="username">
+                        <input type="text" id="username" value="admin" required autocomplete="username">
                         <div class="quick-fill">
-                            <button type="button" class="quick-btn" onclick="fillCreds('guest', 'guest')">Guest/Guest</button>
                             <button type="button" class="quick-btn" onclick="fillCreds('admin', 'admin')">Admin/Admin</button>
+                            <button type="button" class="quick-btn" onclick="fillCreds('user', 'user')">User/User</button>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="password">Password</label>
-                        <input type="password" id="password" value="guest" required autocomplete="current-password">
+                        <input type="password" id="password" value="admin" required autocomplete="current-password">
                     </div>
-                    <button type="submit" class="btn-login">Login to Netis Web</button>
+                    <button type="submit" class="btn-login">Login to Router Web</button>
                 </form>
 
                 <div id="loginSuccess" class="loginSuccess">
-                    ✓ Authenticated! Connected to Netis Web Gateway (192.168.1.1).
+                    ✓ Authenticated! Connected to Router Web Gateway (192.168.1.1).
                 </div>
             </div>
             <div class="footer">
-                Netis Systems Co., Ltd. • Firmware v1.0.0
+                WiFi Router App • Firmware v1.0.3
             </div>
         </div>
 
@@ -590,7 +590,7 @@ private fun generateNetisLoginHtml(): String {
                 var pass = document.getElementById('password').value;
                 var box = document.getElementById('loginSuccess');
                 box.style.display = 'block';
-                box.innerHTML = '✓ Welcome, ' + user + '! Logged in to Netis Router Web at 192.168.1.1/index.html';
+                box.innerHTML = '✓ Welcome, ' + user + '! Logged in to Router Web at 192.168.1.1/index.html';
             }
         </script>
     </body>

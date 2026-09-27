@@ -1,6 +1,8 @@
 package com.example.ui.components
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -9,7 +11,12 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,7 +34,7 @@ import androidx.compose.ui.unit.sp
 
 /**
  * Dock Toggle-style selector for refresh rate switching: 60Hz | 120Hz | 144Hz.
- * Highly responsive, zero-frame-drop transitions with animated indicator pill.
+ * Features a smooth sliding swipe indicator pill with spring physics.
  */
 @Composable
 fun RefreshRateDockToggle(
@@ -36,47 +43,78 @@ fun RefreshRateDockToggle(
     modifier: Modifier = Modifier,
     options: List<Int> = listOf(60, 120, 144)
 ) {
-    val dockShape = RoundedCornerShape(24.dp)
+    val dockShape = RoundedCornerShape(22.dp)
+    val thumbShape = RoundedCornerShape(18.dp)
+    val itemWidth = 58.dp
+    val itemHeight = 36.dp
+    val spacing = 3.dp
+    val innerPadding = 3.dp
+
+    val selectedIndex = remember(selectedRate, options) {
+        val idx = options.indexOf(selectedRate)
+        if (idx >= 0) idx else 1 // default to 120Hz if not found
+    }
+
+    // Smooth gliding pill indicator
+    val thumbOffset by animateDpAsState(
+        targetValue = (selectedIndex * (itemWidth.value + spacing.value)).dp,
+        animationSpec = spring(
+            dampingRatio = 0.75f,
+            stiffness = Spring.StiffnessMediumLow
+        ),
+        label = "refreshRateThumbOffset"
+    )
+
+    val totalWidth = (itemWidth * options.size) + (spacing * (options.size - 1)) + (innerPadding * 2)
 
     Box(
         modifier = modifier
+            .width(totalWidth)
+            .height(itemHeight + (innerPadding * 2))
             .clip(dockShape)
             .background(Color(0xFF10141D))
             .border(1.dp, Color(0xFF222B3D), dockShape)
-            .padding(4.dp)
+            .padding(innerPadding)
             .testTag("refresh_rate_dock_toggle")
     ) {
+        // --- Gliding Thumb Pill ---
+        Box(
+            modifier = Modifier
+                .offset(x = thumbOffset)
+                .width(itemWidth)
+                .fillMaxHeight()
+                .clip(thumbShape)
+                .background(
+                    Brush.horizontalGradient(
+                        colors = listOf(
+                            Color(0xFF0066CC),
+                            Color(0xFF0099FF)
+                        )
+                    )
+                )
+                .border(1.dp, Color(0xFF38BDF8).copy(alpha = 0.5f), thumbShape)
+        )
+
+        // --- Foreground Options Row ---
         Row(
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.spacedBy(spacing),
             verticalAlignment = Alignment.CenterVertically
         ) {
             options.forEach { rate ->
                 val isSelected = selectedRate == rate
-                val pillShape = RoundedCornerShape(20.dp)
 
                 val textColor by animateColorAsState(
                     targetValue = if (isSelected) Color.White else Color(0xFF8A99AD),
                     animationSpec = spring(stiffness = 600f),
-                    label = "dockPillText"
+                    label = "dockPillText_$rate"
                 )
 
                 Box(
                     modifier = Modifier
-                        .clip(pillShape)
-                        .background(
-                            if (isSelected) {
-                                Brush.horizontalGradient(
-                                    colors = listOf(
-                                        Color(0xFF0066CC),
-                                        Color(0xFF0099FF)
-                                    )
-                                )
-                            } else {
-                                Brush.horizontalGradient(
-                                    colors = listOf(Color.Transparent, Color.Transparent)
-                                )
-                            }
-                        )
+                        .width(itemWidth)
+                        .fillMaxHeight()
+                        .clip(thumbShape)
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null
@@ -85,14 +123,13 @@ fun RefreshRateDockToggle(
                                 onRateSelected(rate)
                             }
                         }
-                        .padding(horizontal = 14.dp, vertical = 8.dp)
                         .testTag("refresh_rate_option_${rate}hz"),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = "${rate}Hz",
                         color = textColor,
-                        fontSize = 13.sp,
+                        fontSize = 12.5.sp,
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
                     )
                 }

@@ -22,6 +22,6 @@ dependencyResolutionManagement {
   }
 }
 
-rootProject.name = "Netis Router"
+rootProject.name = "WiFi Router App"
 
 include(":app")

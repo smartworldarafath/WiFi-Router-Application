@@ -9,7 +9,7 @@ data class WanInfo(
     val secondaryDns: String = "1.1.1.1",
     val status: String = "Connected",
     val uptime: String = "4d 18h 32m",
-    val routerModel: String = "Netis WF2409E 300Mbps Wireless N",
+    val routerModel: String = "WiFi Gateway Router 300Mbps",
     val hardwareVersion: String = "V1.0",
     val firmwareVersion: String = "V2.4.42116",
     val currentDownloadSpeedMbps: Float = 14.8f,
@@ -18,14 +18,14 @@ data class WanInfo(
 
 data class WirelessSettings(
     val radioEnabled: Boolean = true,
-    val ssid: String = "netis_2.4G_E8F0",
+    val ssid: String = "WiFi_Gateway_2.4G",
     val securityMode: String = "WPA2-PSK (AES)",
-    val password: String = "netis@wifi2026",
+    val password: String = "wifi@router2026",
     val channel: String = "Auto (Current: Ch 6)",
     val channelWidth: String = "40 MHz",
     val transmitPower: String = "100% (High)",
     val guestNetworkEnabled: Boolean = false,
-    val guestSsid: String = "netis_Guest",
+    val guestSsid: String = "Guest_WiFi",
     val guestPassword: String = "guest@1234",
     val broadcastSsid: Boolean = true
 )

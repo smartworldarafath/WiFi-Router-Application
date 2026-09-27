@@ -1,18 +1,32 @@
 package com.example.ui.screens
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
+import androidx.annotation.DrawableRes
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,30 +37,37 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Coffee
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.QrCode2
-import androidx.compose.material.icons.filled.Router
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -54,11 +75,52 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.example.performance.AppIconOption
+import com.example.ui.theme.NetisBluePrimary
+import com.example.ui.theme.NetisCyanAccent
 import com.example.update.GitHubReleaseService
+
+enum class PaymentMethodOption(
+    val title: String,
+    val subtitle: String,
+    val brandColor: Color,
+    val accountIdentifier: String,
+    val copyValue: String,
+    @DrawableRes val qrDrawableRes: Int?,
+    val qrSeed: Int = 101
+) {
+    REDOT_PAY(
+        title = "RedotPay",
+        subtitle = "Scan with RedotPay App • Global Crypto / Card",
+        brandColor = Color(0xFFE51D24),
+        accountIdentifier = "RedotPay ID: 1965421414",
+        copyValue = "1965421414",
+        qrDrawableRes = com.example.R.drawable.qr_redotpay
+    ),
+    NSAVE(
+        title = "nsave",
+        subtitle = "Md Arafath Rahman (@arafath_rahman9) • Zero-Fee Friends & Family",
+        brandColor = Color(0xFF1E3A8A),
+        accountIdentifier = "@arafath_rahman9",
+        copyValue = "@arafath_rahman9",
+        qrDrawableRes = com.example.R.drawable.qr_nsave
+    ),
+    NAGAD(
+        title = "Nagad",
+        subtitle = "Bangladesh Mobile Banking / Personal",
+        brandColor = Color(0xFFF26522),
+        accountIdentifier = "Nagad Personal: 017XXXXXXXX",
+        copyValue = "017XXXXXXXX",
+        qrDrawableRes = null,
+        qrSeed = 101
+    )
+}
 
 @Composable
 fun AppInfoDrawerScreen(
@@ -67,60 +129,97 @@ fun AppInfoDrawerScreen(
 ) {
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
+    var showCoffeePopup by remember { mutableStateOf(false) }
 
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
             .testTag("app_info_screen"),
         contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+        verticalArrangement = Arrangement.spacedBy(18.dp)
     ) {
-        // App Identity Card
+        // App Identity Card - Redesigned consistent with Update section
         item {
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(22.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                ),
+                border = BorderStroke(
+                    1.dp,
+                    MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
                 )
             ) {
                 Row(
-                    modifier = Modifier.padding(20.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    // App Icon with consistent 64.dp sizing and exact original proportions (never zoomed out)
                     Box(
                         modifier = Modifier
                             .size(64.dp)
+                            .aspectRatio(1f)
                             .clip(RoundedCornerShape(16.dp))
-                            .background(currentIcon.primaryColor.copy(alpha = 0.2f)),
+                            .background(currentIcon.primaryColor.copy(alpha = 0.18f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Image(
                             painter = painterResource(id = currentIcon.previewResId),
                             contentDescription = "App Icon",
                             modifier = Modifier
-                                .fillMaxSize()
-                                .padding(2.dp),
+                                .size(52.dp)
+                                .aspectRatio(1f),
                             contentScale = ContentScale.Fit
                         )
                     }
 
                     Spacer(modifier = Modifier.width(16.dp))
 
-                    Column {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
+                                text = "App Version",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            // Clean version pill badge next to app version
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f))
+                                    .padding(horizontal = 7.dp, vertical = 2.dp)
+                            ) {
+                                Text(
+                                    text = GitHubReleaseService.CURRENT_APP_VERSION,
+                                    fontSize = 11.5.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
                         Text(
-                            text = "Netis Router",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Black
+                            text = "WiFi Router App",
+                            style = MaterialTheme.typography.headlineSmall.copy(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 22.sp
+                            ),
+                            color = MaterialTheme.colorScheme.onSurface
                         )
+
+                        Spacer(modifier = Modifier.height(2.dp))
+
                         Text(
-                            text = "Version ${GitHubReleaseService.CURRENT_APP_VERSION} (Build 4)",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        Text(
-                            text = "Native Jetpack Compose Companion App",
+                            text = "${GitHubReleaseService.CURRENT_APP_VERSION} (Build 4) • Companion App",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -225,7 +324,7 @@ fun AppInfoDrawerScreen(
                             onClick = {
                                 val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
                                     data = Uri.parse("mailto:arafathrahman711@gmail.com")
-                                    putExtra(Intent.EXTRA_SUBJECT, "Netis Router Android App Feedback")
+                                    putExtra(Intent.EXTRA_SUBJECT, "WiFi Router App Feedback")
                                 }
                                 try {
                                     context.startActivity(emailIntent)
@@ -243,268 +342,389 @@ fun AppInfoDrawerScreen(
             }
         }
 
-        // Section: "Buy Me a Coffee" Support Card
+        // Redesigned "Buy Me a Coffee" Section - Shows ONLY "Buy Me a Coffee"
         item {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Coffee,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
-                )
-                Text(
-                    text = "Buy Me a Coffee (Support the Project)",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        }
-
-        // Payment Method 1: RedotPay (Original)
-        item {
-            PaymentSupportCard(
-                title = "RedotPay",
-                subtitle = "Scan with RedotPay app • Instant Global Payment",
-                brandColor = Color(0xFFE51D24),
-                accountIdentifier = "RedotPay ID: 1965421414",
-                copyValue = "1965421414",
-                qrDrawableRes = com.example.R.drawable.qr_redotpay,
-                onSaveQr = {
-                    Toast.makeText(context, "RedotPay QR saved to gallery", Toast.LENGTH_SHORT).show()
-                },
-                onShare = {
-                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                        type = "text/plain"
-                        putExtra(Intent.EXTRA_TEXT, "Support Netis Router via RedotPay ID: 1965421414")
-                    }
-                    context.startActivity(Intent.createChooser(shareIntent, "Share RedotPay Info"))
-                }
-            )
-        }
-
-        // Payment Method 2: nsave (Original)
-        item {
-            PaymentSupportCard(
-                title = "nsave",
-                subtitle = "Md Arafath Rahman (@arafath_rahman9) • Zero-Fee Friends & Family",
-                brandColor = Color(0xFF0B132B),
-                accountIdentifier = "@arafath_rahman9",
-                copyValue = "@arafath_rahman9",
-                qrDrawableRes = com.example.R.drawable.qr_nsave,
-                onSaveQr = {
-                    Toast.makeText(context, "nsave QR saved to gallery", Toast.LENGTH_SHORT).show()
-                },
-                onShare = {
-                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                        type = "text/plain"
-                        putExtra(Intent.EXTRA_TEXT, "Support Netis Router via nsave: @arafath_rahman9 (Md Arafath Rahman)")
-                    }
-                    context.startActivity(Intent.createChooser(shareIntent, "Share nsave Info"))
-                }
-            )
-        }
-
-        // Payment Method 3: Nagad (Personal)
-        item {
-            PaymentSupportCard(
-                title = "Nagad",
-                subtitle = "Bangladesh Mobile Banking / Personal",
-                brandColor = Color(0xFFF26522),
-                accountIdentifier = "Nagad Personal: 017XXXXXXXX",
-                copyValue = "017XXXXXXXX",
-                qrDrawableRes = null,
-                qrSeed = 101,
-                onSaveQr = {
-                    Toast.makeText(context, "Nagad QR saved to gallery", Toast.LENGTH_SHORT).show()
-                },
-                onShare = {
-                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                        type = "text/plain"
-                        putExtra(Intent.EXTRA_TEXT, "Support Netis Router via Nagad: 017XXXXXXXX")
-                    }
-                    context.startActivity(Intent.createChooser(shareIntent, "Share Nagad Support Info"))
-                }
-            )
-        }
-    }
-}
-
-@Composable
-fun PaymentSupportCard(
-    title: String,
-    subtitle: String,
-    brandColor: Color,
-    accountIdentifier: String,
-    copyValue: String,
-    @androidx.annotation.DrawableRes qrDrawableRes: Int? = null,
-    qrSeed: Int = 101,
-    onSaveQr: () -> Unit,
-    onShare: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val context = androidx.compose.ui.platform.LocalContext.current
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(22.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
-    ) {
-        Column(modifier = Modifier.padding(20.dp)) {
-            // Header
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
-                    Box(
-                        modifier = Modifier
-                            .size(42.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(brandColor),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = title.take(2).uppercase(),
-                            color = Color.White,
-                            fontWeight = FontWeight.Black,
-                            fontSize = 16.sp
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Column {
-                        Text(
-                            text = title,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = subtitle,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Visual QR Centerpiece
-            Box(
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(18.dp))
-                    .background(Color(0xFF0F172A))
-                    .padding(vertical = 18.dp, horizontal = 12.dp),
-                contentAlignment = Alignment.Center
+                    .clip(RoundedCornerShape(20.dp))
+                    .clickable { showCoffeePopup = true }
+                    .testTag("buy_me_a_coffee_button"),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color(0xFF161E2E)
+                ),
+                border = BorderStroke(1.dp, Color(0xFF2C3E55))
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    if (qrDrawableRes != null) {
-                        androidx.compose.foundation.Image(
-                            painter = androidx.compose.ui.res.painterResource(id = qrDrawableRes),
-                            contentDescription = "$title QR Code",
-                            modifier = Modifier
-                                .size(175.dp)
-                                .clip(RoundedCornerShape(14.dp))
-                                .background(Color.White)
-                                .padding(8.dp)
-                        )
-                    } else {
-                        StylizedQrVisual(
-                            primaryColor = brandColor,
-                            seed = qrSeed,
-                            modifier = Modifier.size(160.dp)
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(10.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(18.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
+                        horizontalArrangement = Arrangement.spacedBy(14.dp),
+                        modifier = Modifier.weight(1f)
                     ) {
-                        Text(
-                            text = accountIdentifier,
-                            color = Color.White,
-                            style = MaterialTheme.typography.labelMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Icon(
-                            imageVector = Icons.Default.ContentCopy,
-                            contentDescription = "Copy",
-                            tint = Color(0xFF00E5FF),
+                        Box(
                             modifier = Modifier
-                                .size(16.dp)
-                                .clickable {
-                                    val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
-                                    val clip = android.content.ClipData.newPlainText(title, copyValue)
-                                    clipboard.setPrimaryClip(clip)
-                                    Toast.makeText(context, "$title copied to clipboard", Toast.LENGTH_SHORT).show()
-                                }
-                        )
+                                .size(46.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    Brush.linearGradient(
+                                        colors = listOf(
+                                            Color(0xFFFFB300),
+                                            Color(0xFFFF8F00)
+                                        )
+                                    )
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Coffee,
+                                contentDescription = "Buy Me a Coffee",
+                                tint = Color.Black,
+                                modifier = Modifier.size(26.dp)
+                            )
+                        }
+
+                        Column {
+                            Text(
+                                text = "Buy Me a Coffee",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = "Support project development & future updates",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color(0xFFA0B2C6),
+                                fontSize = 12.sp
+                            )
+                        }
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(Color(0xFF222F44))
+                            .padding(horizontal = 12.dp, vertical = 8.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Text(
+                                text = "Support",
+                                color = Color(0xFFFFB300),
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                                contentDescription = null,
+                                tint = Color(0xFFFFB300),
+                                modifier = Modifier.size(14.dp)
+                            )
+                        }
                     }
                 }
             }
+        }
+    }
 
-            Spacer(modifier = Modifier.height(16.dp))
+    // Smooth Animated Card-Style Mini Popup for Payment Methods
+    if (showCoffeePopup) {
+        BuyMeACoffeeDialog(
+            onDismiss = { showCoffeePopup = false }
+        )
+    }
+}
 
-            // Actions: "Copy", "Save QR" & "Share"
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+/**
+ * Animated Card-Style Mini Popup Window for Buy Me a Coffee.
+ * Hardware-accelerated transitions ensure zero frame drops while displaying payment methods cleanly.
+ */
+@Composable
+private fun BuyMeACoffeeDialog(
+    onDismiss: () -> Unit
+) {
+    val context = LocalContext.current
+    var selectedMethod by remember { mutableStateOf(PaymentMethodOption.REDOT_PAY) }
+
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false,
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true
+        )
+    ) {
+        AnimatedVisibility(
+            visible = true,
+            enter = scaleIn(initialScale = 0.90f, animationSpec = spring(stiffness = 500f)) + fadeIn(),
+            exit = scaleOut(targetScale = 0.90f) + fadeOut()
+        ) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth(0.92f)
+                    .clip(RoundedCornerShape(24.dp))
+                    .border(1.dp, Color(0xFF2B3A52), RoundedCornerShape(24.dp))
+                    .testTag("buy_me_a_coffee_popup"),
+                color = Color(0xFF0F1522),
+                tonalElevation = 8.dp
             ) {
-                OutlinedButton(
-                    onClick = {
-                        val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
-                        val clip = android.content.ClipData.newPlainText(title, copyValue)
-                        clipboard.setPrimaryClip(clip)
-                        Toast.makeText(context, "Copied: $copyValue", Toast.LENGTH_SHORT).show()
-                    },
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(12.dp)
+                Column(
+                    modifier = Modifier.padding(20.dp),
+                    verticalArrangement = Arrangement.spacedBy(14.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.ContentCopy,
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text("Copy", fontSize = 12.sp)
-                }
+                    // Header with Coffee icon and close button
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(38.dp)
+                                    .clip(CircleShape)
+                                    .background(Color(0xFFFFB300).copy(alpha = 0.2f)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Coffee,
+                                    contentDescription = null,
+                                    tint = Color(0xFFFFB300),
+                                    modifier = Modifier.size(22.dp)
+                                )
+                            }
+                            Column {
+                                Text(
+                                    text = "Buy Me a Coffee",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White
+                                )
+                                Text(
+                                    text = "Select a payment method to support",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = Color(0xFF869AB5),
+                                    fontSize = 11.sp
+                                )
+                            }
+                        }
 
-                Button(
-                    onClick = onSaveQr,
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = brandColor,
-                        contentColor = Color.White
-                    )
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Download,
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text("Save", fontSize = 12.sp)
-                }
+                        IconButton(
+                            onClick = onDismiss,
+                            modifier = Modifier
+                                .size(32.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFF1B2433))
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Close",
+                                tint = Color(0xFFA0B2C9),
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                    }
 
-                OutlinedButton(
-                    onClick = onShare,
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Share,
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text("Share", fontSize = 12.sp)
+                    // Payment Method Dock Selector: RedotPay | nsave | Nagad
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(Color(0xFF141C2A))
+                            .border(1.dp, Color(0xFF222C3E), RoundedCornerShape(14.dp))
+                            .padding(4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        PaymentMethodOption.entries.forEach { method ->
+                            val isSelected = selectedMethod == method
+                            val pillShape = RoundedCornerShape(10.dp)
+
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clip(pillShape)
+                                    .background(
+                                        if (isSelected) {
+                                            Brush.horizontalGradient(
+                                                listOf(
+                                                    method.brandColor,
+                                                    method.brandColor.copy(alpha = 0.85f)
+                                                )
+                                            )
+                                        } else {
+                                            Brush.horizontalGradient(
+                                                listOf(Color.Transparent, Color.Transparent)
+                                            )
+                                        }
+                                    )
+                                    .clickable(
+                                        interactionSource = remember { MutableInteractionSource() },
+                                        indication = null
+                                    ) {
+                                        selectedMethod = method
+                                    }
+                                    .padding(vertical = 8.dp)
+                                    .testTag("method_${method.title.lowercase()}"),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = method.title,
+                                    color = if (isSelected) Color.White else Color(0xFF8899AE),
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                    fontSize = 12.sp
+                                )
+                            }
+                        }
+                    }
+
+                    // Detailed Card for Selected Payment Method
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(18.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color(0xFF151D2C)
+                        ),
+                        border = BorderStroke(1.dp, Color(0xFF243144))
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = selectedMethod.subtitle,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color(0xFFA0B4CC),
+                                fontSize = 11.5.sp
+                            )
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            // QR Visual
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .background(Color(0xFF090E17))
+                                    .padding(vertical = 14.dp, horizontal = 8.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    if (selectedMethod.qrDrawableRes != null) {
+                                        Image(
+                                            painter = painterResource(id = selectedMethod.qrDrawableRes!!),
+                                            contentDescription = "${selectedMethod.title} QR",
+                                            modifier = Modifier
+                                                .size(150.dp)
+                                                .clip(RoundedCornerShape(12.dp))
+                                                .background(Color.White)
+                                                .padding(6.dp)
+                                        )
+                                    } else {
+                                        StylizedQrVisual(
+                                            primaryColor = selectedMethod.brandColor,
+                                            seed = selectedMethod.qrSeed,
+                                            modifier = Modifier.size(150.dp)
+                                        )
+                                    }
+
+                                    Spacer(modifier = Modifier.height(10.dp))
+
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.Center
+                                    ) {
+                                        Text(
+                                            text = selectedMethod.accountIdentifier,
+                                            color = Color.White,
+                                            style = MaterialTheme.typography.labelMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            fontFamily = FontFamily.Monospace,
+                                            fontSize = 12.sp
+                                        )
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Icon(
+                                            imageVector = Icons.Default.ContentCopy,
+                                            contentDescription = "Copy",
+                                            tint = NetisCyanAccent,
+                                            modifier = Modifier
+                                                .size(16.dp)
+                                                .clickable {
+                                                    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                                    clipboard.setPrimaryClip(ClipData.newPlainText(selectedMethod.title, selectedMethod.copyValue))
+                                                    Toast.makeText(context, "${selectedMethod.title} details copied", Toast.LENGTH_SHORT).show()
+                                                }
+                                        )
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(14.dp))
+
+                            // Action Buttons: Copy, Save, Share
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                OutlinedButton(
+                                    onClick = {
+                                        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                        clipboard.setPrimaryClip(ClipData.newPlainText(selectedMethod.title, selectedMethod.copyValue))
+                                        Toast.makeText(context, "Copied: ${selectedMethod.copyValue}", Toast.LENGTH_SHORT).show()
+                                    },
+                                    modifier = Modifier.weight(1f),
+                                    shape = RoundedCornerShape(10.dp)
+                                ) {
+                                    Icon(Icons.Default.ContentCopy, contentDescription = null, modifier = Modifier.size(14.dp))
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text("Copy", fontSize = 11.5.sp)
+                                }
+
+                                Button(
+                                    onClick = {
+                                        Toast.makeText(context, "${selectedMethod.title} QR saved to gallery", Toast.LENGTH_SHORT).show()
+                                    },
+                                    modifier = Modifier.weight(1f),
+                                    shape = RoundedCornerShape(10.dp),
+                                    colors = ButtonDefaults.buttonColors(containerColor = selectedMethod.brandColor)
+                                ) {
+                                    Icon(Icons.Default.Download, contentDescription = null, modifier = Modifier.size(14.dp))
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text("Save", fontSize = 11.5.sp)
+                                }
+
+                                OutlinedButton(
+                                    onClick = {
+                                        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                                            type = "text/plain"
+                                            putExtra(
+                                                Intent.EXTRA_TEXT,
+                                                "Support WiFi Router App via ${selectedMethod.title}: ${selectedMethod.copyValue}"
+                                            )
+                                        }
+                                        context.startActivity(Intent.createChooser(shareIntent, "Share ${selectedMethod.title} Info"))
+                                    },
+                                    modifier = Modifier.weight(1f),
+                                    shape = RoundedCornerShape(10.dp)
+                                ) {
+                                    Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(14.dp))
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text("Share", fontSize = 11.5.sp)
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -512,7 +732,7 @@ fun PaymentSupportCard(
 }
 
 @Composable
-fun StylizedQrVisual(
+private fun StylizedQrVisual(
     primaryColor: Color,
     seed: Int,
     modifier: Modifier = Modifier

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -872,6 +873,7 @@ private fun SettingsDrawerScreenInternal(
                                     Box(
                                         modifier = Modifier
                                             .size(64.dp)
+                                            .aspectRatio(1f)
                                             .clip(RoundedCornerShape(16.dp))
                                             .background(iconOption.primaryColor.copy(alpha = 0.2f)),
                                         contentAlignment = Alignment.Center
@@ -880,8 +882,8 @@ private fun SettingsDrawerScreenInternal(
                                             painter = painterResource(id = iconOption.previewResId),
                                             contentDescription = iconOption.title,
                                             modifier = Modifier
-                                                .fillMaxSize()
-                                                .padding(2.dp),
+                                                .size(50.dp)
+                                                .aspectRatio(1f),
                                             contentScale = ContentScale.Fit
                                         )
 
@@ -892,7 +894,7 @@ private fun SettingsDrawerScreenInternal(
                                                     .padding(4.dp)
                                                     .size(20.dp)
                                                     .clip(CircleShape)
-                                                    .background(NetisSuccess),
+                                                    .background(Color(0xFF10B981)),
                                                 contentAlignment = Alignment.Center
                                             ) {
                                                 Icon(

@@ -1,6 +1,6 @@
 {
-  "name": "Netis Router",
-  "description": "Companion app for Netis WiFi router web dashboard with live network telemetry, high refresh rate support, and router management.",
+  "name": "WiFi Router App",
+  "description": "Companion app for WiFi router web dashboards with live network telemetry, high refresh rate support, automatic router detection, and router management.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

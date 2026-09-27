@@ -46,7 +46,7 @@ class FeedbackService(private val context: Context) {
             return@withContext Result.failure(IllegalArgumentException("Please enter a message."))
         }
 
-        val formattedHeader = "App: Netis Router | Version: ${GitHubReleaseService.CURRENT_APP_VERSION} | Type: ${type.label} | Message: $userMessage"
+        val formattedHeader = "App: WiFi Router App | Version: ${GitHubReleaseService.CURRENT_APP_VERSION} | Type: ${type.label} | Message: $userMessage"
         val fullText = if (includeDeviceInfo) {
             val deviceInfo = getDeviceSummary()
             "$formattedHeader\n\n[Diagnostics Auto-Attached]\n$deviceInfo"

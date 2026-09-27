@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -77,9 +78,13 @@ fun UpdatesDrawerScreen(
         item {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
+                shape = RoundedCornerShape(22.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f)
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                ),
+                border = androidx.compose.foundation.BorderStroke(
+                    1.dp,
+                    MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
                 )
             ) {
                 Row(
@@ -92,16 +97,17 @@ fun UpdatesDrawerScreen(
                     Box(
                         modifier = Modifier
                             .size(64.dp)
+                            .aspectRatio(1f)
                             .clip(RoundedCornerShape(16.dp))
-                            .background(currentIcon.primaryColor.copy(alpha = 0.2f)),
+                            .background(currentIcon.primaryColor.copy(alpha = 0.18f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Image(
                             painter = painterResource(id = currentIcon.previewResId),
                             contentDescription = "App Icon",
                             modifier = Modifier
-                                .fillMaxSize()
-                                .padding(2.dp),
+                                .size(52.dp)
+                                .aspectRatio(1f),
                             contentScale = ContentScale.Fit
                         )
                     }
@@ -109,22 +115,47 @@ fun UpdatesDrawerScreen(
                     Spacer(modifier = Modifier.width(16.dp))
 
                     Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = "Installed App Version",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        Spacer(modifier = Modifier.height(2.dp))
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
+                                text = "App Version",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            // Clean version pill badge next to app version
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f))
+                                    .padding(horizontal = 7.dp, vertical = 2.dp)
+                            ) {
+                                Text(
+                                    text = GitHubReleaseService.CURRENT_APP_VERSION,
+                                    fontSize = 11.5.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
                         Text(
                             text = GitHubReleaseService.CURRENT_APP_VERSION,
-                            style = MaterialTheme.typography.headlineMedium.copy(
+                            style = MaterialTheme.typography.headlineSmall.copy(
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 24.sp
+                                fontSize = 22.sp
                             ),
                             color = MaterialTheme.colorScheme.onSurface
                         )
+
+                        Spacer(modifier = Modifier.height(2.dp))
+
                         Text(
-                            text = "Package: com.netisrouter.app",
+                            text = "WiFi Router App • Build 4",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -133,21 +164,22 @@ fun UpdatesDrawerScreen(
                     IconButton(
                         onClick = onCheckForUpdates,
                         modifier = Modifier
-                            .size(48.dp)
+                            .size(44.dp)
                             .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f))
+                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f))
                             .testTag("refresh_updates_button")
                     ) {
                         if (updateState is UpdateState.Checking) {
                             CircularProgressIndicator(
-                                modifier = Modifier.size(24.dp),
+                                modifier = Modifier.size(22.dp),
                                 strokeWidth = 2.5.dp
                             )
                         } else {
                             Icon(
                                 imageVector = Icons.Default.Refresh,
                                 contentDescription = "Check for Updates",
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(22.dp)
                             )
                         }
                     }

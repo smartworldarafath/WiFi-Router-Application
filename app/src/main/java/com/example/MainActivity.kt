@@ -69,6 +69,7 @@ import com.example.performance.RefreshRateManager
 import com.example.ui.components.DrawerDestination
 import com.example.ui.components.ForcedUpdateDialog
 import com.example.ui.components.NetisDrawerSheet
+import com.example.ui.screens.AppIconsDrawerScreen
 import com.example.ui.screens.AppInfoDrawerScreen
 import com.example.ui.screens.DashboardScreen
 import com.example.ui.screens.FeedbackDrawerScreen
@@ -394,7 +395,8 @@ fun AppScaffoldContent(
                     Text(
                         text = when (currentDestination) {
                             DrawerDestination.ROUTER_WEB -> "Router Admin"
-                            DrawerDestination.DASHBOARD -> "Netis Router"
+                            DrawerDestination.DASHBOARD -> "WiFi Router App"
+                            DrawerDestination.APP_ICONS -> "App Icons & UI Style"
                             DrawerDestination.SETTINGS -> "Settings"
                             DrawerDestination.APP_UPDATES -> "App Updates"
                             DrawerDestination.APP_INFO -> "App Info"
@@ -480,6 +482,11 @@ fun AppScaffoldContent(
                     DrawerDestination.DASHBOARD -> DashboardScreen(
                         repository = repository,
                         onOpenRouterWeb = { onNavigateDestination(DrawerDestination.ROUTER_WEB) }
+                    )
+                    DrawerDestination.APP_ICONS -> AppIconsDrawerScreen(
+                        currentIcon = currentIcon,
+                        onIconChanged = onIconChanged,
+                        appPreferences = appPreferences
                     )
                     DrawerDestination.SETTINGS -> SettingsDrawerScreen(
                         telemetryFlow = telemetryFlow,

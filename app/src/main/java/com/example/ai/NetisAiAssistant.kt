@@ -48,10 +48,10 @@ class NetisAiAssistant {
 
         val prompt = if (!userQuery.isNullOrBlank()) {
             """
-            You are the Netis Router AI Network Engineer & Diagnostics Assistant.
+            You are the WiFi Router AI Network Engineer & Diagnostics Assistant.
             The user asks: "$userQuery"
-            Current Netis Router Context:
-            - Model: Netis WF2409E Wireless N
+            Current WiFi Router Context:
+            - Model: WiFi Gateway Router 300Mbps
             - SSID: $ssid
             - Current Channel: $currentChannel
             - Active Connected Devices: $connectedDevicesCount
@@ -61,9 +61,9 @@ class NetisAiAssistant {
             """.trimIndent()
         } else {
             """
-            You are the Netis Router AI Network Engineer.
-            Analyze the following Netis Router network status:
-            - Router Model: Netis WF2409E 300Mbps Wireless N
+            You are the WiFi Router AI Network Engineer.
+            Analyze the following WiFi Router network status:
+            - Router Model: WiFi Gateway Router 300Mbps
             - SSID: $ssid
             - Wireless Channel: $currentChannel
             - Active DHCP Clients: $connectedDevicesCount devices

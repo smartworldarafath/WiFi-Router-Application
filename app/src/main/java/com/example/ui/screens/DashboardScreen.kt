@@ -143,14 +143,14 @@ fun DashboardScreen(
     if (showRebootConfirmDialog) {
         AlertDialog(
             onDismissRequest = { showRebootConfirmDialog = false },
-            title = { Text("Reboot Netis Router?") },
+            title = { Text("Reboot Router?") },
             text = { Text("The router will reboot. Internet connectivity and WiFi will temporarily be suspended for ~30 seconds.") },
             confirmButton = {
                 Button(
                     onClick = {
                         showRebootConfirmDialog = false
                         repository.rebootRouter {
-                            Toast.makeText(context, "Netis Router rebooted successfully!", Toast.LENGTH_LONG).show()
+                            Toast.makeText(context, "Router rebooted successfully!", Toast.LENGTH_LONG).show()
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = NetisDanger)
@@ -170,7 +170,7 @@ fun DashboardScreen(
     if (isRebooting) {
         AlertDialog(
             onDismissRequest = {},
-            title = { Text("Rebooting Netis WF2409E...") },
+            title = { Text("Rebooting Router...") },
             text = {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
                     CircularProgressIndicator(modifier = Modifier.size(48.dp))
@@ -1234,7 +1234,7 @@ fun ToolsAndAiTabView(
                             Spacer(modifier = Modifier.width(12.dp))
                             Column {
                                 Text(
-                                    text = "Netis AI Diagnostics",
+                                    text = "Router AI Diagnostics",
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold
                                 )

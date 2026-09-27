@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Router
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SystemUpdate
@@ -54,6 +56,7 @@ import com.example.ui.theme.NetisSuccess
 enum class DrawerDestination(val title: String, val icon: ImageVector) {
     ROUTER_WEB("Router Admin", Icons.Default.Language),
     DASHBOARD("Native Dashboard", Icons.Default.Router),
+    APP_ICONS("App Icons", Icons.Default.Palette),
     SETTINGS("Settings", Icons.Default.Settings),
     APP_UPDATES("App Updates", Icons.Default.SystemUpdate),
     APP_INFO("App Info", Icons.Default.Info),
@@ -100,34 +103,36 @@ fun NetisDrawerSheet(
                         Box(
                             modifier = Modifier
                                 .size(48.dp)
+                                .aspectRatio(1f)
                                 .clip(RoundedCornerShape(14.dp))
                                 .background(Color.White.copy(alpha = 0.15f)),
                             contentAlignment = Alignment.Center
                         ) {
                             Image(
                                 painter = painterResource(id = currentIcon.previewResId),
-                                contentDescription = "Netis App Icon",
+                                contentDescription = "App Icon",
                                 modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(2.dp),
+                                    .size(38.dp)
+                                    .aspectRatio(1f),
                                 contentScale = ContentScale.Fit
                             )
                         }
 
                         Column {
                             Text(
-                                text = "netis",
-                                style = MaterialTheme.typography.titleLarge.copy(
-                                    fontWeight = FontWeight.Black,
-                                    fontSize = 22.sp,
-                                    letterSpacing = 1.sp
+                                text = "WiFi Router App",
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 19.sp,
+                                    letterSpacing = 0.5.sp
                                 ),
                                 color = Color.White
                             )
+                            Spacer(modifier = Modifier.height(2.dp))
                             Text(
-                                text = "WF2409E Wireless N",
+                                text = "Universal Gateway Manager",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = Color.White.copy(alpha = 0.8f)
+                                color = Color.White.copy(alpha = 0.85f)
                             )
                         }
                     }
@@ -149,7 +154,7 @@ fun NetisDrawerSheet(
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = "192.168.1.1 • Online",
+                            text = "WiFi Gateway • Online",
                             style = MaterialTheme.typography.labelSmall,
                             color = Color.White,
                             fontWeight = FontWeight.Medium
@@ -227,12 +232,14 @@ fun NetisDrawerSheet(
                 color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
             )
 
-            // The 4 Specific Sections in Required Order:
-            // 1) SETTINGS
-            // 2) APP UPDATES
-            // 3) APP INFO
-            // 4) FEEDBACK
+            // Sections in Required Order:
+            // 1) APP ICONS (Dedicated UI Section)
+            // 2) SETTINGS
+            // 3) APP UPDATES
+            // 4) APP INFO
+            // 5) FEEDBACK
             val orderedDestinations = listOf(
+                DrawerDestination.APP_ICONS,
                 DrawerDestination.SETTINGS,
                 DrawerDestination.APP_UPDATES,
                 DrawerDestination.APP_INFO,
@@ -263,6 +270,13 @@ fun NetisDrawerSheet(
                                     Text("New", fontSize = 10.sp, fontWeight = FontWeight.Bold)
                                 }
                             }
+                        } else if (destination == DrawerDestination.APP_ICONS) {
+                            Badge(
+                                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onTertiaryContainer
+                            ) {
+                                Text("New", fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                            }
                         }
                     },
                     selected = selectedDestination == destination,
@@ -289,7 +303,7 @@ fun NetisDrawerSheet(
             // Footer
             Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp)) {
                 Text(
-                    text = "Netis Router Companion v1.0.0",
+                    text = "WiFi Router App v1.0.3",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
                 )

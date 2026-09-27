@@ -94,7 +94,7 @@ fun ForcedUpdateDialog(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "A critical new version of Netis Router (${latestRelease.tagName}) is available. Your current version is ${GitHubReleaseService.CURRENT_APP_VERSION}. Please update to continue using the application.",
+                    text = "A critical new version of WiFi Router App (${latestRelease.tagName}) is available. Your current version is ${GitHubReleaseService.CURRENT_APP_VERSION}. Please update to continue using the application.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     lineHeight = 20.sp
