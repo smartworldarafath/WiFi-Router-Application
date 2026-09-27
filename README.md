@@ -105,7 +105,8 @@ Pre-compiled and signed APK binaries are available directly from the repository'
 
 | Version | Build | Release Type | Direct Download |
 | :--- | :---: | :---: | :--- |
-| **v1.0.2** | Build 3 | Latest Stable | [Download APK](https://github.com/smartworldarafath/WiFi-Router-Application/releases/download/v1.0.2/WiFi.Router.Application.v1.0.2.apk) |
+| **v1.0.3** | Build 4 | Latest Stable | [Download APK](https://github.com/smartworldarafath/WiFi-Router-Application/releases/download/v1.0.3/WiFi.Router.Application.v1.0.3.apk) |
+| **v1.0.2** | Build 3 | Previous Stable | [Download APK](https://github.com/smartworldarafath/WiFi-Router-Application/releases/download/v1.0.2/WiFi.Router.Application.v1.0.2.apk) |
 | **v1.0.0** | Build 1 | Initial Release | [Download APK](https://github.com/smartworldarafath/WiFi-Router-Application/releases/download/v1.0.0/WiFi.Router.Application.v1.0.0.apk) |
 
 > **Note**: Android will prompt to "Allow installation from this source" when installing via third-party downloads or browser.

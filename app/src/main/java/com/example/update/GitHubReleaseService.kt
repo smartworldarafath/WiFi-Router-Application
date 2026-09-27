@@ -146,6 +146,27 @@ class GitHubReleaseService {
     fun getFallbackReleases(): List<GitHubRelease> {
         return listOf(
             GitHubRelease(
+                tagName = "v1.0.3",
+                name = "WiFi Router Application v1.0.3 (Build 4)",
+                body = """
+                    ## v1.0.3 • Build 4
+                    * Dedicated App Icons Screen — Preview launcher icons in a crisp 1:1 aspect ratio with instant switching.
+                    * Sliding Dock Toggles — Fluid horizontal sliding and swipe-responsive dock controls with spring physics.
+                    * Refined App Info & Updates — Enhanced UI styling, QR sharing, version badge, and direct changelog access.
+                    * Unified Branding — Polished WiFi Router App identity and cleaner navigation experience.
+                    * Performance & Stability — Enhanced memory efficiency, smoother refresh rates, and bug fixes.
+                """.trimIndent(),
+                publishedAt = "2026-09-27T10:00:00Z",
+                htmlUrl = "https://github.com/smartworldarafath/WiFi-Router-Application/releases/tag/v1.0.3",
+                assets = listOf(
+                    ReleaseAsset(
+                        name = "WiFi.Router.Application.v1.0.3.apk",
+                        downloadUrl = "https://github.com/smartworldarafath/WiFi-Router-Application/releases/download/v1.0.3/WiFi.Router.Application.v1.0.3.apk",
+                        sizeBytes = 24_494_209L
+                    )
+                )
+            ),
+            GitHubRelease(
                 tagName = "v1.0.2",
                 name = "WiFi Router Application v1.0.2 (Build 3)",
                 body = """
